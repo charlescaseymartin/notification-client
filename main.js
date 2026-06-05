@@ -8,7 +8,7 @@ const LOG_FILE = join(homedir(), ".notification-client.log");
 
 function Logger(type, value) {
   const timestamp = new Date().getTime();
-  const logEntry = `${timestamp} | ${type} | ${JSON.stringify(value)}`;
+  const logEntry = `${timestamp} | ${type} | ${JSON.stringify(value)}\n`;
   try {
     appendFileSync(LOG_FILE, logEntry, "utf8");
   } catch (err) {
