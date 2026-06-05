@@ -29,6 +29,7 @@ async function main() {
     const channel = realtimeClient.channels.get("notify");
     await channel.subscribe(({ name, data }) => {
       systemNotification(name, data);
+      console.log(`${name}: ${data}`);
     });
   } catch (err) {
     console.error(err.message);
