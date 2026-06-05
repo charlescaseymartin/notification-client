@@ -31,11 +31,14 @@ function systemNotification(message) {
       Logger("[[ Notification API Error ]]", err);
       return;
     }
+
     if (stderr) {
       console.error(`CLI error: ${stderr}`);
       Logger("[[ Command Execution Error ]]", stderr);
       return;
     }
+
+    return stdout;
   });
 }
 
