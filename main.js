@@ -1,18 +1,16 @@
-import { existsSync, writeFileSync, appendFileSync } from "node:fs";
+import { appendFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 import { exec } from "node:child_process";
 import * as Ably from "ably";
 
-const LOG_FILE = "~/.notification-client.log";
+const LOG_FILE = join(homedir(), ".notification-client.log");
 
 function Logger(type, value) {
   const timestamp = new Date().getTime();
   const logEntry = `${timestamp} | ${type} | ${JSON.stringify(value)}`;
   try {
-    if (existsSync(LOG_FILE)) {
-      appendFileSync(LOG_FILE, logEntry);
-    } else {
-      writeFileSync(LOG_FILE, logEntry);
-    }
+    appendFileSync(LOG_FILE, logEntry, "utf8");
   } catch (err) {
     console.error(`Error Logging To File: ${err.message}`);
   }
