@@ -1,5 +1,22 @@
+import { existsSync, writeFileSync, appendFileSync } from "node:fs";
 import { exec } from "node:child_process";
 import * as Ably from "ably";
+
+const LOG_FILE = "~/.notification-client.log";
+
+function Logger(type, value) {
+  const timestamp = new Date().getTime();
+  const logEntry = `${timestamp} | ${type} | ${JSON.stringify(value)}`;
+  try {
+    if (existsSync(LOG_FILE)) {
+      appendFileSync(LOG_FILE, logEntry);
+    } else {
+      writeFileSync(LOG_FILE, logEntry);
+    }
+  } catch (err) {
+    console.error(`Error Logging To File: ${err.message}`);
+  }
+}
 
 function systemNotification(message) {
   const safeMessage = message
@@ -11,10 +28,13 @@ function systemNotification(message) {
   exec(command, (err, stdout, stderr) => {
     if (err) {
       console.error(`Error executing notification: ${err.message}`);
+      Logger("[[ Notification API Error ]]", err);
       return;
     }
     if (stderr) {
       console.error(`CLI error: ${stderr}`);
+      Logger("[[ Command Execution Error ]]", stderr);
+      return;
     }
   });
 }
@@ -32,6 +52,7 @@ async function main() {
     await channel.subscribe(({ data }) => systemNotification(data));
   } catch (err) {
     console.error(err.message);
+    Logger("[[ Runtime Error ]]", err);
     process.exit(1);
   }
 }
