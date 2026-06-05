@@ -1,10 +1,12 @@
 import { exec } from "node:child_process";
 import * as Ably from "ably";
 
-function systemNotification(title, message) {
-  const safeTitle = title.replace(/'/g, "'\\''");
-  const safeMessage = message.replace(/'/g, "'\\''");
-  const command = `termux-notification -t "${safeTitle}" -c "${safeMessage}" --priority max --sound --vibrate 800`;
+function systemNotification(message) {
+  const safeMessage = message
+    .replace("[[ ", "")
+    .replace(" ]]", "")
+    .replace(/'/g, "'\\''");
+  const command = `termux-notification -t "${safeMessage}" --priority max --sound --vibrate 800`;
 
   exec(command, (err, stdout, stderr) => {
     if (err) {
@@ -27,10 +29,7 @@ async function main() {
     console.log("[+] Connected!");
 
     const channel = realtimeClient.channels.get("notify");
-    await channel.subscribe(({ name, data }) => {
-      systemNotification(name, data);
-      console.log(`${name}: ${data}`);
-    });
+    await channel.subscribe(({ data }) => systemNotification(data));
   } catch (err) {
     console.error(err.message);
     process.exit(1);
