@@ -4,7 +4,7 @@ import * as Ably from "ably";
 function systemNotification(title, message) {
   const safeTitle = title.replace(/'/g, "'\\''");
   const safeMessage = message.replace(/'/g, "'\\''");
-  const command = `termux-notification -t '${safeTitle}' -c '${safeMessage}' --sound`;
+  const command = `termux-notification -t "${safeTitle}" -c "${safeMessage}" --priority max --sound --vibrate 800`;
 
   exec(command, (err, stdout, stderr) => {
     if (err) {
