@@ -1,4 +1,21 @@
+import { exec } from "node:child_process";
 import * as Ably from "ably";
+
+function systemNotification(title, message) {
+  const safeTitle = title.replace(/'/g, "'\\''");
+  const safeMessage = message.replace(/'/g, "'\\''");
+  const command = `termux-notification -t '${safeTitle}' -c '${safeMessage}' --sound`;
+
+  exec(command, (err, stdout, stderr) => {
+    if (err) {
+      console.error(`Error executing notification: ${err.message}`);
+      return;
+    }
+    if (stderr) {
+      console.error(`CLI error: ${stderr}`);
+    }
+  });
+}
 
 async function main() {
   try {
@@ -11,7 +28,7 @@ async function main() {
 
     const channel = realtimeClient.channels.get("notify");
     await channel.subscribe(({ name, data }) => {
-      console.log(`${name}: ${data}`);
+      systemNotification(name, data);
     });
   } catch (err) {
     console.error(err.message);
